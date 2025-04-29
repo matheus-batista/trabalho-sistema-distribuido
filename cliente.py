@@ -1,33 +1,57 @@
-import Pyro5.api
+# -*- coding: utf-8 -*-
+import socket
 
-ns = Pyro5.api.locate_ns() #localiza servidor de nomes
-uri = ns.lookup("calculadora") # obtem localizacao objeto calculadora
-proxy = Pyro5.api.Proxy(uri)
+# Criar o socket do cliente
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-op=int(input("digite a opcao\n"))
-while(op!=7):
-    if(op==1):
-        a=int(input("digite primeiro numero :\n"))
-        b=int(input("digite segundo numero :\n"))
-        print("\nresultado :",proxy.soma(a,b))
-    elif(op==2):
-        a=int(input("digite primeiro numero :\n"))
-        b=int(input("digite segundo numero :\n"))
-        print("\nresultado :",proxy.subtracao(a,b))
-    elif(op==3):
-        a=int(input("digite primeiro numero :\n"))
-        b=int(input("digite segundo numero :\n"))
-        print("\nresultado :",proxy.multiplicacao(a,b))
-    elif(op==4):
-        a=int(input("digite primeiro numero :\n"))
-        b=int(input("digite segundo numero :\n"))
-        print("\nresultado :",proxy.divisao(a,b))
-    elif(op==5):
-        a=int(input("digite primeiro numero :\n"))
-        print("\nresultado :",proxy.raiz(a))
-    elif(op==6):
-        a=int(input("digite primeiro numero :\n"))
-        b=int(input("digite segundo numero :\n"))
-        print("\nresultado :",proxy.exponenciacao(a,b))
+# Definir o host e a porta
+host = '192.168.68.103'  # IP do servidor
+port = 12345         # Porta do servidor
 
-    op=int(input("digite a opcao\n"))
+# Conectar ao servidor
+client_socket.connect((host, port))
+
+num=0
+while num!="5":
+    print()
+    num=str(input("\n --------digite uma opcao: -------------\n 1-listar\n 2-remover\n 3-copy\n 4-baixar\n 5-sair\n ")) 
+
+    if(num=="1"): # listar diretorio
+        client_socket.send(num.encode())# Enviar uma resposta ao servidor
+        dados=client_socket.recv(1024).decode('utf-8')#RESPOSTA SERVIDOR
+        print("\n --------------LISTAGEM ARQUIVOS DIRETORIO-------------\n")
+        print(dados)
+
+    elif(num=="2"): # remover arquivo diretorio
+        client_socket.send(num.encode()) # Enviar uma resposta ao servidor
+        nome=str(input("\n------digite nome arquivo a ser excluido :---------\n"))
+        client_socket.send(nome.encode())#envia nome servidor
+        print(client_socket.recv(1024).decode('utf-8'))#RESPOSTA SERVIDOR
+
+    elif(num=="3"): # copia arquivo de uma pasta para outra
+        client_socket.send(num.encode()) # Enviar uma resposta ao servidor
+        nome=str(input("\n------digite nome arquivo a ser copiado :---------\n"))
+        client_socket.send(nome.encode())#envia nome servidor
+        nome2=str(input("\n------digite o diretorio aonde sera colocado a copia arquivo :---------\n"))
+        client_socket.send(nome2.encode())#envia endereco pasta para servidor
+        print(client_socket.recv(1024).decode('utf-8'))#RESPOSTA SERVIDOR
+
+    elif(num=="4"):# baixa arquivo de uma pasta
+        client_socket.send(num.encode()) # Enviar uma resposta ao servidor
+        nome=str(input("\n------digite nome arquivo a ser copiado :---------\n"))
+        client_socket.send(nome.encode())#envia nome servidor
+        nome2=str(input("\n------digite o diretorio aonde sera colocado a copia arquivo :---------\n"))
+        client_socket.send(nome2.encode())#envia endereco pasta para servidor
+        print(client_socket.recv(1024).decode('utf-8'))#RESPOSTA SERVIDOR
+
+    elif(num=="5"):
+      # Enviar uma resposta ao servidor
+        client_socket.send(num.encode())
+
+    else:
+        print("comando invalido digite novamente\n")
+
+
+
+
+
